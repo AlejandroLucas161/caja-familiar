@@ -7,7 +7,6 @@ const FILTERS: { id: MovementFilter; label: string }[] = [
   { id: "ALL", label: "Todos" },
   { id: "SEND", label: "Envíos" },
   { id: "EXPENSE", label: "Gastos" },
-  { id: "SAVING", label: "Ahorros" },
 ];
 
 interface FilterTabsProps {
@@ -21,7 +20,7 @@ export function FilterTabs({ value, onChange, className }: FilterTabsProps) {
     <div
       role="tablist"
       aria-label="Filtrar por tipo"
-      className={cn("grid grid-cols-4 gap-1.5", className)}
+      className={cn("grid grid-cols-3 gap-1.5", className)}
     >
       {FILTERS.map((filter) => {
         const active = value === filter.id;

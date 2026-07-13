@@ -47,11 +47,6 @@ export function DashboardView() {
           amount={totals.totalExpenses}
           accent="#F87171"
         />
-        <SummaryCard
-          label="Total ahorrado"
-          amount={totals.totalSavings}
-          accent="#60A5FA"
-        />
       </div>
 
       <ColorLegend />
@@ -67,7 +62,7 @@ export function DashboardView() {
         {recent.length === 0 ? (
           <EmptyState
             title="Todavía no hay movimientos"
-            description="Agregá el primer envío, gasto o ahorro."
+            description="Agregá el primer envío o gasto."
             action={
               <Button asChild className="h-12 rounded-xl px-6 text-base">
                 <Link href="/agregar">Agregar movimiento</Link>

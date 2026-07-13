@@ -16,7 +16,7 @@ import { dateInputToIso, toDateInputValue } from "@/utils/format";
 
 const schema = z
   .object({
-    type: z.enum(["SEND", "EXPENSE", "SAVING", "ADJUSTMENT"]),
+    type: z.enum(["SEND", "EXPENSE", "ADJUSTMENT"]),
     amount: z
       .string()
       .min(1, "Ingresá un monto")

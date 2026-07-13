@@ -1,6 +1,6 @@
 # Caja Familiar
 
-Aplicación web privada para registrar dinero enviado a la familia y controlar gastos, ahorros y saldos de forma extremadamente simple.
+Aplicación web privada para registrar dinero enviado a la familia y controlar gastos y saldos de forma extremadamente simple.
 
 ## Stack
 
@@ -116,7 +116,7 @@ supabase/
 ## Fórmula del saldo
 
 ```
-Saldo = Total enviado − Total gastado + Total ahorro (+ ajustes)
+Saldo = Total enviado − Total gastado (+ ajustes)
 ```
 
 ## Scripts

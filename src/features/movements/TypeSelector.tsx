@@ -10,7 +10,6 @@ const TYPES: {
 }[] = [
   { id: "SEND", label: "Envío", color: "#4ADE80" },
   { id: "EXPENSE", label: "Gasto", color: "#F87171" },
-  { id: "SAVING", label: "Ahorro", color: "#60A5FA" },
 ];
 
 interface TypeSelectorProps {
@@ -20,7 +19,7 @@ interface TypeSelectorProps {
 
 export function TypeSelector({ value, onChange }: TypeSelectorProps) {
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid grid-cols-2 gap-2">
       {TYPES.map((type) => {
         const active = value === type.id;
         return (

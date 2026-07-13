@@ -52,11 +52,6 @@ export function StatisticsView() {
             amount={monthTotals.totalExpenses}
             accent="#F87171"
           />
-          <SummaryCard
-            label="Ahorrado"
-            amount={monthTotals.totalSavings}
-            accent="#60A5FA"
-          />
         </div>
       </section>
 

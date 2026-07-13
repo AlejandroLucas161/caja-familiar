@@ -4,13 +4,11 @@ export interface Totals {
   balance: number;
   totalSent: number;
   totalExpenses: number;
-  totalSavings: number;
 }
 
 export function calculateTotals(movements: Movement[]): Totals {
   let totalSent = 0;
   let totalExpenses = 0;
-  let totalSavings = 0;
   let adjustments = 0;
 
   for (const m of movements) {
@@ -21,9 +19,6 @@ export function calculateTotals(movements: Movement[]): Totals {
       case "EXPENSE":
         totalExpenses += m.amount;
         break;
-      case "SAVING":
-        totalSavings += m.amount;
-        break;
       case "ADJUSTMENT":
         adjustments += m.amount;
         break;
@@ -33,8 +28,7 @@ export function calculateTotals(movements: Movement[]): Totals {
   return {
     totalSent,
     totalExpenses,
-    totalSavings,
-    balance: totalSent - totalExpenses + totalSavings + adjustments,
+    balance: totalSent - totalExpenses + adjustments,
   };
 }
 

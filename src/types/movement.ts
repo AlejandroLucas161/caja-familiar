@@ -1,4 +1,4 @@
-export type MovementType = "SEND" | "EXPENSE" | "SAVING" | "ADJUSTMENT";
+export type MovementType = "SEND" | "EXPENSE" | "ADJUSTMENT";
 
 export type Workspace = "family" | "demo";
 
@@ -35,4 +35,4 @@ export interface MovementInput {
   createdAt?: string;
 }
 
-export type MovementFilter = "ALL" | "SEND" | "EXPENSE" | "SAVING";
+export type MovementFilter = "ALL" | "SEND" | "EXPENSE";

@@ -5,7 +5,7 @@
 create table if not exists public.movements (
   id uuid primary key default gen_random_uuid(),
   workspace text not null check (workspace in ('family', 'demo')),
-  type text not null check (type in ('SEND', 'EXPENSE', 'SAVING', 'ADJUSTMENT')),
+  type text not null check (type in ('SEND', 'EXPENSE', 'ADJUSTMENT')),
   amount numeric not null check (amount > 0),
   person text,
   category text,
@@ -86,6 +86,5 @@ alter publication supabase_realtime add table public.movements;
 -- values
 --   ('demo', 'SEND', 250000, 'Alejandro', null, 'Pago del mes', now() - interval '5 days'),
 --   ('demo', 'EXPENSE', 35000, 'Mariangel', 'comida', 'Supermercado', now() - interval '3 days'),
---   ('demo', 'SAVING', 50000, 'Felix', 'ahorro', 'Ahorro mensual', now() - interval '2 days'),
 --   ('demo', 'EXPENSE', 12000, 'Bonnie', 'transporte', 'Combustible', now() - interval '1 day'),
 --   ('demo', 'SEND', 100000, 'Anais', null, 'Extra', now());

@@ -23,7 +23,6 @@ export const CATEGORIES = [
   { id: "educacion", label: "Educación", emoji: "🎓" },
   { id: "mascotas", label: "Mascotas", emoji: "🐶" },
   { id: "otros", label: "Otros", emoji: "🎁" },
-  { id: "ahorro", label: "Ahorro", emoji: "💰" },
 ] as const;
 
 export type CategoryId = (typeof CATEGORIES)[number]["id"];
@@ -55,14 +54,6 @@ export const MOVEMENT_TYPE_META: Record<
     textClass: "text-[#F87171]",
     sign: "-",
   },
-  SAVING: {
-    label: "Ahorro",
-    verb: "ahorró",
-    color: "#60A5FA",
-    bgClass: "bg-[#60A5FA]/15",
-    textClass: "text-[#60A5FA]",
-    sign: "+",
-  },
   ADJUSTMENT: {
     label: "Corrección",
     verb: "corrigió",
@@ -76,7 +67,6 @@ export const MOVEMENT_TYPE_META: Record<
 export const COLOR_LEGEND = [
   { label: "Envío", emoji: "🟢", color: "#4ADE80" },
   { label: "Gasto", emoji: "🔴", color: "#F87171" },
-  { label: "Ahorro", emoji: "🔵", color: "#60A5FA" },
   { label: "Pendiente", emoji: "🟡", color: "#FACC15" },
   { label: "Corrección", emoji: "⚪", color: "#A1A1AA" },
 ] as const;

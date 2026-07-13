@@ -7,11 +7,19 @@ import type {
   Workspace,
 } from "@/types/movement";
 
-function mapRow(row: MovementRow): Movement {
+function mapRow(row: MovementRow): Movement | null {
+  if (
+    row.type !== "SEND" &&
+    row.type !== "EXPENSE" &&
+    row.type !== "ADJUSTMENT"
+  ) {
+    return null;
+  }
+
   return {
     id: row.id,
     workspace: row.workspace as Workspace,
-    type: row.type as Movement["type"],
+    type: row.type,
     amount: Number(row.amount),
     person: row.person,
     category: row.category,
@@ -40,7 +48,9 @@ export async function fetchMovements(
   const { data, error } = await query;
   if (error) throw error;
 
-  let movements = (data as MovementRow[]).map(mapRow);
+  let movements = (data as MovementRow[])
+    .map(mapRow)
+    .filter((m): m is Movement => m !== null);
 
   const q = search.trim().toLowerCase();
   if (q) {
@@ -91,7 +101,9 @@ export async function createMovement(
     .single();
 
   if (error) throw error;
-  return mapRow(data as MovementRow);
+  const movement = mapRow(data as MovementRow);
+  if (!movement) throw new Error("Tipo de movimiento no válido");
+  return movement;
 }
 
 export async function updateMovement(
@@ -116,7 +128,9 @@ export async function updateMovement(
     .single();
 
   if (error) throw error;
-  return mapRow(data as MovementRow);
+  const movement = mapRow(data as MovementRow);
+  if (!movement) throw new Error("Tipo de movimiento no válido");
+  return movement;
 }
 
 export async function deleteMovement(id: string): Promise<void> {
