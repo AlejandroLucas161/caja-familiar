@@ -1,36 +1,129 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Caja Familiar
 
-## Getting Started
+Aplicación web privada para registrar dinero enviado a la familia y controlar gastos, ahorros y saldos de forma extremadamente simple.
 
-First, run the development server:
+## Stack
+
+- **Frontend:** Next.js (App Router), TypeScript, Tailwind CSS, shadcn/ui, Lucide, Recharts
+- **Estado:** TanStack Query + Context (auth)
+- **Backend:** Supabase (Auth + Postgres + Realtime + RLS)
+- **Hosting:** Vercel
+
+## Requisitos
+
+- Node.js 20+
+- Cuenta de Supabase
+- Cuenta de Vercel (para deploy)
+
+## Setup local
+
+### 1. Instalar dependencias
+
+```bash
+npm install
+```
+
+### 2. Variables de entorno
+
+Copiá `.env.example` a `.env.local` y completá:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+NEXT_PUBLIC_DEMO_EMAIL=demo@tudominio.com
+NEXT_PUBLIC_DEMO_PASSWORD=una-password-segura
+```
+
+> Nunca uses la `service_role` key en el frontend.
+
+### 3. Base de datos (Supabase)
+
+1. Abrí el **SQL Editor** de tu proyecto Supabase.
+2. Ejecutá el contenido de [`supabase/migrations/001_movements.sql`](supabase/migrations/001_movements.sql).
+
+Eso crea:
+
+- tabla `movements`
+- índices
+- trigger `updated_at`
+- RLS por `workspace`
+- publicación Realtime
+
+### 4. Crear usuarios (manual)
+
+En **Authentication → Users → Add user**, creá exactamente dos usuarios:
+
+| Usuario | Email (ejemplo) | `user_metadata` |
+|---------|-----------------|-----------------|
+| Familia | `familia@tudominio.com` | `{ "workspace": "family" }` |
+| Demo    | el de `NEXT_PUBLIC_DEMO_EMAIL` | `{ "workspace": "demo" }` |
+
+En Supabase, al crear el usuario, agregá el metadata JSON:
+
+```json
+{ "workspace": "family" }
+```
+
+o
+
+```json
+{ "workspace": "demo" }
+```
+
+Desactivá el registro público si está habilitado (**Authentication → Providers → Email → Disable sign ups**).
+
+### 5. Seed demo (opcional)
+
+Ejecutá [`supabase/seed_demo.sql`](supabase/seed_demo.sql) en el SQL Editor (después de crear el usuario demo).
+
+### 6. Correr la app
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrí [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy en Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Conectá el repo a Vercel.
+2. Configurá las mismas variables de entorno que en `.env.local`.
+3. Deploy.
 
-## Learn More
+## Seguridad
 
-To learn more about Next.js, take a look at the following resources:
+- Solo se usa la **anon key** en el cliente.
+- RLS garantiza que cada usuario solo vea/escriba su `workspace` (`family` | `demo`).
+- No hay registro público, recuperación de contraseña ni administración de usuarios en la app.
+- Cambiar contraseña usa `supabase.auth.updateUser` sobre la sesión actual.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Estructura
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+  app/           # Rutas (login + app)
+  components/    # UI compartida
+  features/      # auth, dashboard, movements, statistics, settings
+  hooks/
+  services/      # CRUD Supabase
+  lib/           # supabase, constants, query keys
+  types/
+  utils/
+supabase/
+  migrations/    # SQL
+```
 
-## Deploy on Vercel
+## Fórmula del saldo
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+Saldo = Total enviado − Total gastado + Total ahorro (+ ajustes)
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Scripts
+
+```bash
+npm run dev      # desarrollo
+npm run build    # build producción
+npm run start    # servir build
+npm run lint     # eslint
+```
