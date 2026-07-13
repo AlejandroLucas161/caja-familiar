@@ -1,12 +1,13 @@
 "use client";
 
-import { use } from "react";
+import { use, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
 import { EmptyState } from "@/components/EmptyState";
 import { MovementListSkeleton } from "@/components/LoadingSkeleton";
 import { MovementForm } from "@/features/movements/MovementForm";
+import { useAuth } from "@/features/auth/AuthContext";
 import {
   useMovement,
   useUpdateMovement,
@@ -19,9 +20,17 @@ export default function EditMovementPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const { canMutate, loading: authLoading } = useAuth();
   const { data, isLoading, isError } = useMovement(id);
   const updateMutation = useUpdateMovement();
   const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !canMutate) {
+      toast.message("El modo Demo es solo lectura");
+      router.replace("/movimientos");
+    }
+  }, [authLoading, canMutate, router]);
 
   async function handleSubmit(input: MovementInput) {
     try {
@@ -33,6 +42,15 @@ export default function EditMovementPage({
         err instanceof Error ? err.message : "No se pudo actualizar",
       );
     }
+  }
+
+  if (authLoading || !canMutate) {
+    return (
+      <EmptyState
+        title="Modo Demo"
+        description="La demo es solo lectura."
+      />
+    );
   }
 
   if (isLoading) return <MovementListSkeleton />;

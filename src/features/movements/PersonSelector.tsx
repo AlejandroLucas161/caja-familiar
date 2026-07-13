@@ -1,6 +1,7 @@
 "use client";
 
-import { PERSONS } from "@/lib/constants";
+import { getPersons } from "@/lib/constants";
+import { useAuth } from "@/features/auth/AuthContext";
 import { cn } from "@/lib/utils";
 
 interface PersonSelectorProps {
@@ -9,9 +10,12 @@ interface PersonSelectorProps {
 }
 
 export function PersonSelector({ value, onChange }: PersonSelectorProps) {
+  const { workspace } = useAuth();
+  const persons = getPersons(workspace);
+
   return (
-    <div className="grid grid-cols-2 gap-2">
-      {PERSONS.map((person) => {
+    <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+      {persons.map((person) => {
         const active = value === person;
         return (
           <button

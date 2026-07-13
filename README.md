@@ -94,8 +94,7 @@ Abrí [http://localhost:3000](http://localhost:3000).
 
 - Solo se usa la **anon key** en el cliente.
 - RLS garantiza que cada usuario solo vea/escriba su `workspace` (`family` | `demo`).
-- No hay registro público, recuperación de contraseña ni administración de usuarios en la app.
-- Cambiar contraseña usa `supabase.auth.updateUser` sobre la sesión actual.
+- No hay registro público, recuperación de contraseña ni cambio de contraseña en la app (las contraseñas se gestionan manualmente en Supabase).
 
 ## Estructura
 

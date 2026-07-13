@@ -83,6 +83,10 @@ export async function createMovement(
   workspace: Workspace,
   input: MovementInput,
 ): Promise<Movement> {
+  if (workspace === "demo") {
+    throw new Error("El modo Demo es solo lectura");
+  }
+
   const supabase = createClient();
   const payload = {
     workspace,
@@ -109,7 +113,12 @@ export async function createMovement(
 export async function updateMovement(
   id: string,
   input: MovementInput,
+  workspace?: Workspace | null,
 ): Promise<Movement> {
+  if (workspace === "demo") {
+    throw new Error("El modo Demo es solo lectura");
+  }
+
   const supabase = createClient();
   const payload = {
     type: input.type,
@@ -133,7 +142,14 @@ export async function updateMovement(
   return movement;
 }
 
-export async function deleteMovement(id: string): Promise<void> {
+export async function deleteMovement(
+  id: string,
+  workspace?: Workspace | null,
+): Promise<void> {
+  if (workspace === "demo") {
+    throw new Error("El modo Demo es solo lectura");
+  }
+
   const supabase = createClient();
   const { error } = await supabase.from("movements").delete().eq("id", id);
   if (error) throw error;

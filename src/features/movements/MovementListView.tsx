@@ -9,6 +9,7 @@ import { MovementCard } from "@/components/MovementCard";
 import { EmptyState } from "@/components/EmptyState";
 import { MovementListSkeleton } from "@/components/LoadingSkeleton";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { useAuth } from "@/features/auth/AuthContext";
 import {
   useDeleteMovement,
   useMovements,
@@ -16,6 +17,7 @@ import {
 import type { Movement, MovementFilter } from "@/types/movement";
 
 export function MovementListView() {
+  const { canMutate, isDemo } = useAuth();
   const [filter, setFilter] = useState<MovementFilter>("ALL");
   const [search, setSearch] = useState("");
   const [toDelete, setToDelete] = useState<Movement | null>(null);
@@ -40,7 +42,14 @@ export function MovementListView() {
 
   return (
     <div className="space-y-4">
-      <Header title="Movimientos" subtitle="Historial completo" />
+      <Header
+        title="Movimientos"
+        subtitle={
+          isDemo
+            ? "Demo de solo lectura — Tierra Media"
+            : "Historial completo"
+        }
+      />
 
       <SearchBar value={search} onChange={setSearch} />
       <FilterTabs value={filter} onChange={setFilter} />
@@ -63,7 +72,8 @@ export function MovementListView() {
             <MovementCard
               key={m.id}
               movement={m}
-              onDelete={setToDelete}
+              showActions={canMutate}
+              onDelete={canMutate ? setToDelete : undefined}
             />
           ))}
         </div>

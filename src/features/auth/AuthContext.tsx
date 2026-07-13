@@ -17,11 +17,12 @@ interface AuthContextValue {
   user: User | null;
   session: Session | null;
   workspace: Workspace | null;
+  isDemo: boolean;
+  canMutate: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signInDemo: () => Promise<void>;
   signOut: () => Promise<void>;
-  updatePassword: (password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -97,26 +98,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
   }, [supabase]);
 
-  const updatePassword = useCallback(
-    async (password: string) => {
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) throw error;
-    },
-    [supabase],
-  );
+  const workspace = resolveWorkspace(user);
+  const isDemo = workspace === "demo";
+  const canMutate = workspace === "family";
 
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
       session,
-      workspace: resolveWorkspace(user),
+      workspace,
+      isDemo,
+      canMutate,
       loading,
       signIn,
       signInDemo,
       signOut,
-      updatePassword,
     }),
-    [user, session, loading, signIn, signInDemo, signOut, updatePassword],
+    [
+      user,
+      session,
+      workspace,
+      isDemo,
+      canMutate,
+      loading,
+      signIn,
+      signInDemo,
+      signOut,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

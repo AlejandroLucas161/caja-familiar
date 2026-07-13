@@ -13,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { Movement, MovementInput, MovementType } from "@/types/movement";
 import { dateInputToIso, toDateInputValue } from "@/utils/format";
+import { APP_SHELL_CLASS } from "@/lib/layout";
+import { cn } from "@/lib/utils";
 
 const schema = z
   .object({
@@ -199,12 +201,12 @@ export function MovementForm({
       </div>
 
       {/* Botón fijo en zona de pulgar, encima del menú inferior */}
-      <div className="fixed inset-x-0 bottom-[4.5rem] z-30 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-sm">
-        <div className="mx-auto w-full max-w-[430px]">
+      <div className="fixed inset-x-0 bottom-[4.5rem] z-30 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-sm md:bottom-[5.25rem] md:px-6">
+        <div className={cn(APP_SHELL_CLASS)}>
           <Button
             type="submit"
             disabled={loading}
-            className="h-14 w-full rounded-xl text-lg font-semibold"
+            className="h-14 w-full rounded-xl text-lg font-semibold md:h-16"
           >
             {loading ? "Guardando..." : submitLabel}
           </Button>

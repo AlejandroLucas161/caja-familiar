@@ -3,7 +3,8 @@ import type { MovementType } from "@/types/movement";
 export const APP_NAME = "Caja Familiar";
 export const APP_VERSION = "1.0.0";
 
-export const PERSONS = [
+/** Personas reales (workspace family) */
+export const FAMILY_PERSONS = [
   "Felix",
   "Mariangel",
   "Bonnie",
@@ -12,7 +13,22 @@ export const PERSONS = [
   "Alejandro",
 ] as const;
 
-export type Person = (typeof PERSONS)[number];
+/** Personas demo (máx. 5 — El Señor de los Anillos) */
+export const DEMO_PERSONS = [
+  "Aragorn",
+  "Frodo",
+  "Gandalf",
+  "Legolas",
+  "Sam",
+] as const;
+
+export type FamilyPerson = (typeof FAMILY_PERSONS)[number];
+export type DemoPerson = (typeof DEMO_PERSONS)[number];
+export type Person = FamilyPerson | DemoPerson;
+
+export function getPersons(workspace: "family" | "demo" | null | undefined) {
+  return workspace === "demo" ? [...DEMO_PERSONS] : [...FAMILY_PERSONS];
+}
 
 export const CATEGORIES = [
   { id: "comida", label: "Comida", emoji: "🍖" },

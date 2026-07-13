@@ -49,11 +49,12 @@ export function useCreateMovement() {
 }
 
 export function useUpdateMovement() {
+  const { workspace } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: MovementInput }) =>
-      updateMovement(id, input),
+      updateMovement(id, input, workspace),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.movements.all });
     },
@@ -61,10 +62,11 @@ export function useUpdateMovement() {
 }
 
 export function useDeleteMovement() {
+  const { workspace } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteMovement(id),
+    mutationFn: (id: string) => deleteMovement(id, workspace),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.movements.all });
     },

@@ -10,9 +10,11 @@ import { EmptyState } from "@/components/EmptyState";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
 import { useMovements } from "@/features/movements/useMovements";
+import { useAuth } from "@/features/auth/AuthContext";
 import { calculateTotals } from "@/utils/balance";
 
 export function DashboardView() {
+  const { isDemo } = useAuth();
   const { data: movements, isLoading, isError } = useMovements("ALL");
 
   if (isLoading) return <LoadingSkeleton />;
@@ -32,11 +34,18 @@ export function DashboardView() {
 
   return (
     <div className="space-y-5">
-      <Header title="Inicio" subtitle="Resumen de la caja familiar" />
+      <Header
+        title="Inicio"
+        subtitle={
+          isDemo
+            ? "Demo de solo lectura — Tierra Media"
+            : "Resumen de la caja familiar"
+        }
+      />
 
       <BalanceCard balance={totals.balance} />
 
-      <div className="grid grid-cols-1 gap-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <SummaryCard
           label="Total enviado"
           amount={totals.totalSent}

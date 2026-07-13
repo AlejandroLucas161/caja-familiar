@@ -41,7 +41,7 @@ export function StatisticsView() {
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Este mes</h2>
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <SummaryCard
             label="Enviado"
             amount={monthTotals.totalSent}

@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { Wallet } from "lucide-react";
 import { useAuth } from "@/features/auth/AuthContext";
 import { APP_NAME } from "@/lib/constants";
+import { APP_SHELL_CLASS } from "@/lib/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 export function LoginForm() {
   const { signIn, signInDemo } = useAuth();
@@ -52,7 +54,12 @@ export function LoginForm() {
   }
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col justify-center px-4 py-10">
+    <div
+      className={cn(
+        APP_SHELL_CLASS,
+        "flex min-h-dvh flex-col justify-center px-4 py-10 md:px-8 md:py-14",
+      )}
+    >
       <div className="mb-8 flex flex-col items-center text-center">
         <div className="mb-4 flex size-16 items-center justify-center rounded-2xl border border-border bg-card">
           <Wallet

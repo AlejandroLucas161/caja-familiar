@@ -32,7 +32,7 @@ export function FilterTabs({ value, onChange, className }: FilterTabsProps) {
             aria-selected={active}
             onClick={() => onChange(filter.id)}
             className={cn(
-              "min-h-11 rounded-xl px-1 py-2 text-xs font-semibold transition-colors active:opacity-90",
+              "min-h-11 rounded-xl px-1 py-2 text-xs font-semibold transition-colors active:opacity-90 md:text-sm",
               active
                 ? "bg-primary text-primary-foreground"
                 : "border border-border bg-card text-foreground",

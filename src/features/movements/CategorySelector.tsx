@@ -10,7 +10,7 @@ interface CategorySelectorProps {
 
 export function CategorySelector({ value, onChange }: CategorySelectorProps) {
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid grid-cols-3 gap-2 md:grid-cols-4">
       {CATEGORIES.map((cat) => {
         const active = value === cat.id;
         return (
