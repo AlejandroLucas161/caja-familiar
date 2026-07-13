@@ -19,6 +19,7 @@ const sql = fs.readFileSync(sqlPath, "utf8");
 const seed = fs.readFileSync(seedPath, "utf8");
 
 const hosts = [
+  `postgresql://postgres.${ref}:${encodeURIComponent(password)}@aws-0-ca-central-1.pooler.supabase.com:6543/postgres`,
   `postgresql://postgres.${ref}:${encodeURIComponent(password)}@aws-0-sa-east-1.pooler.supabase.com:6543/postgres`,
   `postgresql://postgres.${ref}:${encodeURIComponent(password)}@aws-0-us-east-1.pooler.supabase.com:6543/postgres`,
   `postgresql://postgres.${ref}:${encodeURIComponent(password)}@aws-0-us-east-2.pooler.supabase.com:6543/postgres`,
