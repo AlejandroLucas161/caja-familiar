@@ -195,8 +195,22 @@ export function MovementForm({
         <Input
           id="date"
           type="date"
-          className="h-12 rounded-xl text-base"
+          className="date-input-full h-12 rounded-xl text-base"
           {...form.register("date")}
+          onClick={(e) => {
+            try {
+              e.currentTarget.showPicker();
+            } catch {
+              // showPicker no disponible: el CSS del indicador cubre el input
+            }
+          }}
+          onFocus={(e) => {
+            try {
+              e.currentTarget.showPicker();
+            } catch {
+              // ignore
+            }
+          }}
         />
       </div>
 
