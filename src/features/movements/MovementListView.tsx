@@ -29,10 +29,11 @@ export function MovementListView() {
 
   async function handleConfirmDelete() {
     if (!toDelete) return;
+    const id = toDelete.id;
+    setToDelete(null);
     try {
-      await deleteMutation.mutateAsync(toDelete.id);
+      await deleteMutation.mutateAsync(id);
       toast.success("Movimiento eliminado");
-      setToDelete(null);
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "No se pudo eliminar",

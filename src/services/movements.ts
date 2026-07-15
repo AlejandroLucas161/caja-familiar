@@ -1,4 +1,10 @@
 import { createClient } from "@/lib/supabase/client";
+import {
+  availableBalance,
+  canAffordExpense,
+  roundMoney,
+} from "@/utils/balance";
+import { formatMoneyBalance } from "@/utils/format";
 import type {
   Movement,
   MovementFilter,
@@ -6,6 +12,22 @@ import type {
   MovementRow,
   Workspace,
 } from "@/types/movement";
+
+async function assertCanAffordExpense(
+  workspace: Workspace,
+  amount: number,
+  excludeMovementId?: string,
+): Promise<void> {
+  const movements = await fetchMovements(workspace, "ALL");
+  const available = availableBalance(movements, excludeMovementId);
+  if (!canAffordExpense(amount, available)) {
+    throw new Error(
+      available <= 0
+        ? "No hay saldo disponible para gastar"
+        : `No podés gastar más de ${formatMoneyBalance(available)}`,
+    );
+  }
+}
 
 function mapRow(row: MovementRow): Movement | null {
   if (
@@ -87,11 +109,16 @@ export async function createMovement(
     throw new Error("El modo Demo es solo lectura");
   }
 
+  const amount = roundMoney(input.amount);
+  if (input.type === "EXPENSE") {
+    await assertCanAffordExpense(workspace, amount);
+  }
+
   const supabase = createClient();
   const payload = {
     workspace,
     type: input.type,
-    amount: input.amount,
+    amount,
     person: input.person,
     category: input.category ?? null,
     description: input.description ?? null,
@@ -119,10 +146,15 @@ export async function updateMovement(
     throw new Error("El modo Demo es solo lectura");
   }
 
+  const amount = roundMoney(input.amount);
+  if (input.type === "EXPENSE" && workspace) {
+    await assertCanAffordExpense(workspace, amount, id);
+  }
+
   const supabase = createClient();
   const payload = {
     type: input.type,
-    amount: input.amount,
+    amount,
     person: input.person,
     category: input.category ?? null,
     description: input.description ?? null,

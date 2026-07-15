@@ -190,3 +190,19 @@ input[type="date"].date-input-full::-webkit-calendar-picker-indicator {
   cursor: pointer;
   opacity: 0;
 }
+
+/* Charts: sin outline feo al focus / active */
+.chart-surface .recharts-wrapper,
+.chart-surface .recharts-surface,
+.chart-surface .recharts-sector,
+.chart-surface .recharts-bar-rectangle,
+.chart-surface .recharts-layer,
+.chart-surface svg:focus,
+.chart-surface svg *:focus {
+  outline: none !important;
+}
+
+.chart-surface .recharts-tooltip-wrapper {
+  z-index: 20;
+  outline: none;
+}

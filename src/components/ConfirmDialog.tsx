@@ -54,7 +54,7 @@ export function ConfirmDialog({
               e.preventDefault();
               onConfirm();
             }}
-            className="h-12 rounded-xl bg-destructive text-base text-white hover:bg-destructive/90 sm:h-14 sm:text-lg"
+            className="h-12 rounded-xl border-transparent bg-[#B91C1C] text-base text-white hover:bg-[#991B1B] hover:text-white focus-visible:ring-[#F87171]/40 sm:h-14 sm:text-lg"
           >
             {confirmLabel}
           </AlertDialogAction>

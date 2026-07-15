@@ -10,8 +10,10 @@ import { MovementForm } from "@/features/movements/MovementForm";
 import { useAuth } from "@/features/auth/AuthContext";
 import {
   useMovement,
+  useMovements,
   useUpdateMovement,
 } from "@/features/movements/useMovements";
+import { availableBalance } from "@/utils/balance";
 import type { MovementInput } from "@/types/movement";
 
 export default function EditMovementPage({
@@ -22,6 +24,7 @@ export default function EditMovementPage({
   const { id } = use(params);
   const { canMutate, loading: authLoading } = useAuth();
   const { data, isLoading, isError } = useMovement(id);
+  const { data: allMovements, isLoading: listLoading } = useMovements("ALL");
   const updateMutation = useUpdateMovement();
   const router = useRouter();
 
@@ -53,7 +56,7 @@ export default function EditMovementPage({
     );
   }
 
-  if (isLoading) return <MovementListSkeleton />;
+  if (isLoading || listLoading) return <MovementListSkeleton />;
 
   if (isError || !data) {
     return (
@@ -64,6 +67,8 @@ export default function EditMovementPage({
     );
   }
 
+  const available = availableBalance(allMovements ?? [], id);
+
   return (
     <div className="space-y-5">
       <Header title="Editar" subtitle="Modificá los datos del movimiento" />
@@ -72,6 +77,7 @@ export default function EditMovementPage({
         onSubmit={handleSubmit}
         submitLabel="Guardar cambios"
         loading={updateMutation.isPending}
+        availableBalance={available}
       />
     </div>
   );

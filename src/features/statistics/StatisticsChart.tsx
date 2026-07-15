@@ -8,6 +8,7 @@ import {
   Pie,
   PieChart,
   ResponsiveContainer,
+  Sector,
   Tooltip,
   XAxis,
   YAxis,
@@ -17,6 +18,7 @@ import { es } from "date-fns/locale";
 import type { Movement } from "@/types/movement";
 import { CATEGORIES } from "@/lib/constants";
 import { formatMoney } from "@/utils/format";
+import { roundMoney } from "@/utils/balance";
 
 const COLORS = [
   "#F87171",
@@ -30,6 +32,10 @@ const COLORS = [
   "#A1A1AA",
 ];
 
+const TICK = "#A8B0BD";
+const GRID = "rgba(255,255,255,0.06)";
+const CURSOR_FILL = "rgba(238,240,243,0.08)";
+
 interface StatisticsChartProps {
   movements: Movement[];
 }
@@ -37,6 +43,73 @@ interface StatisticsChartProps {
 function categoryLabel(id: string): string {
   const found = CATEGORIES.find((c) => c.id === id);
   return found ? found.label : id;
+}
+
+function ChartTooltip(props: Record<string, unknown>) {
+  const active = Boolean(props.active);
+  const payload = props.payload as
+    | ReadonlyArray<{ name?: string | number; value?: string | number; color?: string }>
+    | undefined;
+  const label = props.label as string | number | undefined;
+
+  if (!active || !payload?.length) return null;
+
+  const item = payload[0];
+  const title = String(label ?? item?.name ?? "");
+  const value = Number(item?.value ?? 0);
+  const swatch = typeof item?.color === "string" ? item.color : undefined;
+
+  return (
+    <div className="min-w-[8.5rem] rounded-xl border border-[#454D5C] bg-[#2A303A] px-3 py-2.5 shadow-xl">
+      <div className="flex items-center gap-2">
+        {swatch ? (
+          <span
+            className="size-2.5 shrink-0 rounded-full"
+            style={{ backgroundColor: swatch }}
+            aria-hidden
+          />
+        ) : null}
+        <p className="text-sm font-medium text-[#EEF0F3]">{title}</p>
+      </div>
+      <p className="mt-1 text-base font-bold tabular-nums text-[#EEF0F3]">
+        {formatMoney(value)}
+      </p>
+    </div>
+  );
+}
+
+function ActivePieShape(props: {
+  cx?: number;
+  cy?: number;
+  innerRadius?: number;
+  outerRadius?: number;
+  startAngle?: number;
+  endAngle?: number;
+  fill?: string;
+}) {
+  const {
+    cx = 0,
+    cy = 0,
+    innerRadius = 0,
+    outerRadius = 0,
+    startAngle = 0,
+    endAngle = 0,
+    fill = COLORS[0],
+  } = props;
+
+  return (
+    <Sector
+      cx={cx}
+      cy={cy}
+      innerRadius={innerRadius}
+      outerRadius={outerRadius + 5}
+      startAngle={startAngle}
+      endAngle={endAngle}
+      fill={fill}
+      stroke="transparent"
+      style={{ outline: "none", filter: "brightness(1.08)" }}
+    />
+  );
 }
 
 export function ExpenseByCategoryChart({
@@ -47,7 +120,7 @@ export function ExpenseByCategoryChart({
 
   for (const m of expenses) {
     const key = m.category ?? "otros";
-    map.set(key, (map.get(key) ?? 0) + m.amount);
+    map.set(key, roundMoney((map.get(key) ?? 0) + m.amount));
   }
 
   const data = Array.from(map.entries()).map(([id, value]) => ({
@@ -64,7 +137,7 @@ export function ExpenseByCategoryChart({
   }
 
   return (
-    <div className="h-64 w-full">
+    <div className="chart-surface h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -76,21 +149,22 @@ export function ExpenseByCategoryChart({
             innerRadius={55}
             outerRadius={90}
             paddingAngle={3}
+            stroke="transparent"
+            activeShape={ActivePieShape}
           >
             {data.map((_, index) => (
               <Cell
                 key={`cell-${index}`}
                 fill={COLORS[index % COLORS.length]}
+                stroke="transparent"
+                style={{ outline: "none", cursor: "pointer" }}
               />
             ))}
           </Pie>
           <Tooltip
-            formatter={(value) => formatMoney(Number(value))}
-            contentStyle={{
-              borderRadius: 12,
-              border: "1px solid hsl(var(--border))",
-              background: "hsl(var(--card))",
-            }}
+            content={ChartTooltip}
+            cursor={false}
+            isAnimationActive={false}
           />
         </PieChart>
       </ResponsiveContainer>
@@ -107,11 +181,11 @@ export function ExpensesByMonthChart({ movements }: StatisticsChartProps) {
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
     const existing = map.get(key);
     if (existing) {
-      existing.total += m.amount;
+      existing.total = roundMoney(existing.total + m.amount);
     } else {
       map.set(key, {
         label: format(d, "MMM yy", { locale: es }),
-        total: m.amount,
+        total: roundMoney(m.amount),
         order: d.getFullYear() * 100 + d.getMonth(),
       });
     }
@@ -130,24 +204,39 @@ export function ExpensesByMonthChart({ movements }: StatisticsChartProps) {
   }
 
   return (
-    <div className="h-64 w-full">
+    <div className="chart-surface h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-          <XAxis dataKey="label" tick={{ fill: "#9CA3AF", fontSize: 12 }} />
-          <YAxis
-            tick={{ fill: "#9CA3AF", fontSize: 12 }}
-            tickFormatter={(v) => `${Math.round(Number(v) / 1000)}k`}
+        <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke={GRID} vertical={false} />
+          <XAxis
+            dataKey="label"
+            tick={{ fill: TICK, fontSize: 12 }}
+            axisLine={false}
+            tickLine={false}
           />
-          <Tooltip
-            formatter={(value) => formatMoney(Number(value))}
-            contentStyle={{
-              borderRadius: 12,
-              border: "none",
-              background: "#1f1f1f",
+          <YAxis
+            tick={{ fill: TICK, fontSize: 12 }}
+            axisLine={false}
+            tickLine={false}
+            tickFormatter={(v) => {
+              const n = Number(v);
+              if (Math.abs(n) >= 1000) return `${Math.round(n / 1000)}k`;
+              return String(Math.round(n));
             }}
           />
-          <Bar dataKey="total" fill="#EF4444" radius={[10, 10, 0, 0]} />
+          <Tooltip
+            content={ChartTooltip}
+            cursor={{ fill: CURSOR_FILL }}
+            isAnimationActive={false}
+          />
+          <Bar
+            dataKey="total"
+            name="Gastado"
+            fill="#F87171"
+            radius={[10, 10, 0, 0]}
+            activeBar={{ fill: "#FCA5A5", stroke: "transparent" }}
+            style={{ outline: "none" }}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -160,7 +249,7 @@ export function CategoryBarsChart({ movements }: StatisticsChartProps) {
 
   for (const m of expenses) {
     const key = m.category ?? "otros";
-    map.set(key, (map.get(key) ?? 0) + m.amount);
+    map.set(key, roundMoney((map.get(key) ?? 0) + m.amount));
   }
 
   const data = Array.from(map.entries())
@@ -179,30 +268,46 @@ export function CategoryBarsChart({ movements }: StatisticsChartProps) {
   }
 
   return (
-    <div className="h-64 w-full">
+    <div className="chart-surface h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} layout="vertical" margin={{ left: 16 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+        <BarChart
+          data={data}
+          layout="vertical"
+          margin={{ left: 8, right: 12, top: 4, bottom: 4 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke={GRID} horizontal={false} />
           <XAxis
             type="number"
-            tick={{ fill: "#9CA3AF", fontSize: 12 }}
-            tickFormatter={(v) => `${Math.round(Number(v) / 1000)}k`}
+            tick={{ fill: TICK, fontSize: 12 }}
+            axisLine={false}
+            tickLine={false}
+            tickFormatter={(v) => {
+              const n = Number(v);
+              if (Math.abs(n) >= 1000) return `${Math.round(n / 1000)}k`;
+              return String(Math.round(n));
+            }}
           />
           <YAxis
             type="category"
             dataKey="name"
-            width={80}
-            tick={{ fill: "#9CA3AF", fontSize: 12 }}
+            width={84}
+            tick={{ fill: TICK, fontSize: 12 }}
+            axisLine={false}
+            tickLine={false}
           />
           <Tooltip
-            formatter={(value) => formatMoney(Number(value))}
-            contentStyle={{
-              borderRadius: 12,
-              border: "none",
-              background: "#1f1f1f",
-            }}
+            content={ChartTooltip}
+            cursor={{ fill: CURSOR_FILL }}
+            isAnimationActive={false}
           />
-          <Bar dataKey="total" fill="#3B82F6" radius={[0, 10, 10, 0]} />
+          <Bar
+            dataKey="total"
+            name="Gastado"
+            fill="#60A5FA"
+            radius={[0, 10, 10, 0]}
+            activeBar={{ fill: "#93C5FD", stroke: "transparent" }}
+            style={{ outline: "none" }}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>

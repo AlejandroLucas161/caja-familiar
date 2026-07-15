@@ -9,6 +9,12 @@ export function formatMoney(amount: number): string {
   }).format(Math.abs(amount));
 }
 
+/** Saldo / totales con signo real (el − no se pierde con Math.abs). */
+export function formatMoneyBalance(amount: number): string {
+  if (amount < 0) return `−${formatMoney(amount)}`;
+  return formatMoney(amount);
+}
+
 export function formatMoneySigned(
   amount: number,
   sign: "+" | "-" = amount >= 0 ? "+" : "-",

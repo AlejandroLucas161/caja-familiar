@@ -5,13 +5,19 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
 import { EmptyState } from "@/components/EmptyState";
+import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { MovementForm } from "@/features/movements/MovementForm";
 import { useAuth } from "@/features/auth/AuthContext";
-import { useCreateMovement } from "@/features/movements/useMovements";
+import {
+  useCreateMovement,
+  useMovements,
+} from "@/features/movements/useMovements";
+import { availableBalance } from "@/utils/balance";
 import type { MovementInput } from "@/types/movement";
 
 export default function AddMovementPage() {
   const { canMutate, loading: authLoading } = useAuth();
+  const { data: movements, isLoading } = useMovements("ALL");
   const createMutation = useCreateMovement();
   const router = useRouter();
 
@@ -43,6 +49,10 @@ export default function AddMovementPage() {
     );
   }
 
+  if (isLoading) return <LoadingSkeleton />;
+
+  const available = availableBalance(movements ?? []);
+
   return (
     <div className="space-y-5">
       <Header title="Agregar" subtitle="Registrá un movimiento en segundos" />
@@ -50,6 +60,7 @@ export default function AddMovementPage() {
         onSubmit={handleSubmit}
         submitLabel="Guardar movimiento"
         loading={createMutation.isPending}
+        availableBalance={available}
       />
     </div>
   );

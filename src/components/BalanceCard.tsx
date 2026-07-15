@@ -1,4 +1,4 @@
-import { formatMoney } from "@/utils/format";
+import { formatMoneyBalance } from "@/utils/format";
 import { cn } from "@/lib/utils";
 
 interface BalanceCardProps {
@@ -18,8 +18,13 @@ export function BalanceCard({ balance, className }: BalanceCardProps) {
       <p className="text-base font-medium text-muted-foreground">
         Saldo disponible
       </p>
-      <p className="mt-2 break-all text-4xl font-bold tabular-nums tracking-tight text-foreground">
-        {formatMoney(balance)}
+      <p
+        className={cn(
+          "mt-2 break-all text-4xl font-bold tabular-nums tracking-tight",
+          balance < 0 ? "text-destructive" : "text-foreground",
+        )}
+      >
+        {formatMoneyBalance(balance)}
       </p>
     </section>
   );

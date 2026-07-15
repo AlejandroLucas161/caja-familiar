@@ -1,6 +1,7 @@
 "use client";
 
 import { Header } from "@/components/Header";
+import { BalanceCard } from "@/components/BalanceCard";
 import { SummaryCard } from "@/components/SummaryCard";
 import { EmptyState } from "@/components/EmptyState";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
@@ -27,6 +28,7 @@ export function StatisticsView() {
   }
 
   const movements = data ?? [];
+  const lifetime = calculateTotals(movements);
   const now = new Date();
   const thisMonth = filterByMonth(
     movements,
@@ -39,16 +41,18 @@ export function StatisticsView() {
     <div className="space-y-5">
       <Header title="Estadísticas" subtitle="Resumen visual de la caja" />
 
+      <BalanceCard balance={lifetime.balance} />
+
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Este mes</h2>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <SummaryCard
-            label="Enviado"
+            label="Enviado este mes"
             amount={monthTotals.totalSent}
             accent="#4ADE80"
           />
           <SummaryCard
-            label="Gastado"
+            label="Gastado este mes"
             amount={monthTotals.totalExpenses}
             accent="#F87171"
           />

@@ -12,7 +12,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { Movement, MovementInput, MovementType } from "@/types/movement";
-import { dateInputToIso, toDateInputValue } from "@/utils/format";
+import {
+  dateInputToIso,
+  formatMoneyBalance,
+  toDateInputValue,
+} from "@/utils/format";
+import { canAffordExpense, roundMoney } from "@/utils/balance";
 import { APP_SHELL_CLASS } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +53,8 @@ interface MovementFormProps {
   onSubmit: (input: MovementInput) => Promise<void> | void;
   submitLabel?: string;
   loading?: boolean;
+  /** Saldo contra el que se valida un gasto (sin el movimiento en edición). */
+  availableBalance?: number;
 }
 
 export function MovementForm({
@@ -55,6 +62,7 @@ export function MovementForm({
   onSubmit,
   submitLabel = "Guardar",
   loading = false,
+  availableBalance = 0,
 }: MovementFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -73,11 +81,27 @@ export function MovementForm({
   useEffect(() => {
     if (type !== "EXPENSE") {
       form.setValue("category", null);
+      form.clearErrors("amount");
     }
   }, [type, form]);
 
   const handleSubmit = form.handleSubmit(async (values) => {
-    const amount = Number(values.amount.replace(",", "."));
+    const amount = roundMoney(Number(values.amount.replace(",", ".")));
+
+    if (
+      values.type === "EXPENSE" &&
+      !canAffordExpense(amount, availableBalance)
+    ) {
+      form.setError("amount", {
+        type: "manual",
+        message:
+          availableBalance <= 0
+            ? "No hay saldo disponible para gastar"
+            : `No podés gastar más de ${formatMoneyBalance(availableBalance)}`,
+      });
+      return;
+    }
+
     await onSubmit({
       type: values.type as MovementType,
       amount,
@@ -123,6 +147,14 @@ export function MovementForm({
             {...form.register("amount")}
           />
         </div>
+        {type === "EXPENSE" ? (
+          <p className="text-sm text-muted-foreground">
+            Disponible:{" "}
+            <span className="font-semibold text-foreground tabular-nums">
+              {formatMoneyBalance(availableBalance)}
+            </span>
+          </p>
+        ) : null}
         {form.formState.errors.amount ? (
           <p className="text-base text-destructive" role="alert">
             {form.formState.errors.amount.message}
